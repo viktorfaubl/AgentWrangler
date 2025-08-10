@@ -32,7 +32,10 @@ public partial class GroqKeyModal : Window
             errorText.IsVisible = true;
             return;
         }
-        var client = new GroqApiClient(key);
+        // Get selected model from MainWindow
+        var mainWindow = (this.Owner as AgentWrangler.Views.MainWindow);
+        string model = mainWindow != null ? AgentWrangler.Views.MainWindow.CleanModelString(mainWindow.SelectedModel) : "moonshotai/kimi-k2-instruct";
+        var client = new GroqApiClient(key, model: model);
         var result = await client.SendOcrResultAsync("ping", "C#");
         if (result != null)
         {

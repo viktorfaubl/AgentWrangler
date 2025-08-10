@@ -8,5 +8,9 @@
         x:Class="AgentWrangler.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="AgentWrangler">
+    <StackPanel>
+        <ComboBox x:Name="ModelComboBox" Width="400" Margin="10"
+                  ItemsSource="{Binding ModelList}" SelectedItem="{Binding SelectedModel, Mode=TwoWay}"/>
         <views:MainView />
+    </StackPanel>
 </Window>

@@ -13,7 +13,7 @@ namespace AgentWrangler.Services
         private readonly string _endpoint;
         private readonly string _model;
 
-        public GroqApiClient(string apiKey, string endpoint = "https://api.groq.com/openai/v1/chat/completions", string model = "moonshotai/kimi-k2-instruct")
+        public GroqApiClient(string apiKey, string endpoint = "https://api.groq.com/openai/v1/chat/completions", string model = "compound-beta-mini")
         {
             _httpClient = new HttpClient();
             _apiKey = apiKey;

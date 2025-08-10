@@ -1,16 +1,51 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AgentWrangler.Services;
 
 namespace AgentWrangler.Views;
 
-public partial class MainWindow : Window
+public partial class MainWindow : Window, INotifyPropertyChanged
 {
+    public ObservableCollection<string> ModelList { get; } = new()
+    {
+        "llama-3.1-8b-instant",
+        "llama-3.3-70b-versatile",
+        "meta-llama/llama-guard-4-12b",
+        "whisper-large-v3",
+        "whisper-large-v3-turbo",
+        "deepseek-r1-distill-llama-70b (Preview Model)",
+        "meta-llama/llama-4-maverick-17b-128e-instruct (Preview Model)",
+        "meta-llama/llama-4-scout-17b-16e-instruct (Preview Model)",
+        "meta-llama/llama-prompt-guard-2-22m (Preview Model)",
+        "meta-llama/llama-prompt-guard-2-86m (Preview Model)",
+        "moonshotai/kimi-k2-instruct (Preview Model)",
+        "openai/gpt-oss-120b (Preview Model)",
+        "openai/gpt-oss-20b (Preview Model)",
+        "playai-tts (Preview Model)",
+        "playai-tts-arabic (Preview Model)",
+        "qwen/qwen3-32b (Preview Model)",
+        "compound-beta (Preview System)",
+        "compound-beta-mini (Preview System)"
+    };
+
+    private string? _selectedModel;
+    public string? SelectedModel
+    {
+        get => _selectedModel;
+        set { _selectedModel = value; OnPropertyChanged(); }
+    }
+
     public MainWindow()
     {
+        DataContext = this;
         InitializeComponent();
+        SelectedModel = ModelList.FirstOrDefault(m => m.StartsWith("compound-beta-mini"));
     }
     protected override async void OnOpened(EventArgs e)
     {
@@ -34,4 +69,15 @@ public partial class MainWindow : Window
         var result = await modal.ShowDialog<string?>(this);
         return result;
     }
+
+    public static string CleanModelString(string model)
+    {
+        if (string.IsNullOrWhiteSpace(model)) return "moonshotai/kimi-k2-instruct";
+        int idx = model.IndexOf(" (");
+        return idx > 0 ? model.Substring(0, idx) : model;
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
