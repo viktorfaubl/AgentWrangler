@@ -18,6 +18,7 @@
             <ComboBox x:Name="ModelComboBox" Width="400" Margin="10"
                       ItemsSource="{Binding ModelList}" SelectedItem="{Binding SelectedModel, Mode=TwoWay}"/>
             <Button x:Name="SendButton" Content="Send" Width="100" Margin="10" />
+            <Button x:Name="OcrButton" Content="OCR" Width="100" Margin="10" />
         </StackPanel>
         <views:MainView Grid.Row="0" />
         <Separator Grid.Row="1" Margin="20,0" />

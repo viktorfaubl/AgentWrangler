@@ -7,6 +7,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AgentWrangler.Services;
+using Avalonia.Interactivity;
+using System.IO;
+using Avalonia.Media.Imaging;
+using Avalonia;
+using System.Windows.Forms;
 
 namespace AgentWrangler.Views;
 
@@ -48,19 +53,95 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectedModel = ModelList.FirstOrDefault(m => m.StartsWith("compound-beta-mini"));
         var sendButton = this.FindControl<Button>("SendButton");
         sendButton.Click += SendButton_Click;
+        var ocrButton = this.FindControl<Button>("OcrButton");
+        ocrButton.Click += OcrButton_Click;
     }
-    protected override async void OnOpened(EventArgs e)
+
+    private async void OcrButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        base.OnOpened(e);
-        var apiKey = ConfigHelper.ReadApiKey();
-        if (string.IsNullOrWhiteSpace(apiKey))
+        // Minimize the window
+        this.WindowState = WindowState.Minimized;
+        
+        string tempFile = Path.Combine(Path.GetTempPath(), $"ocr_screenshot_{Guid.NewGuid()}.jpg");
+        bool screenshotSuccess = false;
+        string debugOutput = "";
+        try
         {
-            apiKey = await OpenGroqKeyModal();
-            if (!string.IsNullOrWhiteSpace(apiKey))
-                ConfigHelper.SaveApiKey(apiKey);
+            if (OperatingSystem.IsWindows())
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "powershell",
+                    Arguments = $"-Command Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $bmp = New-Object Drawing.Bitmap([Windows.Forms.Screen]::PrimaryScreen.Bounds.Width, [Windows.Forms.Screen]::PrimaryScreen.Bounds.Height); $graphics = [Drawing.Graphics]::FromImage($bmp); $graphics.CopyFromScreen(0, 0, 0, 0, $bmp.Size); $bmp.Save('{tempFile}', [Drawing.Imaging.ImageFormat]::Jpeg); $graphics.Dispose(); $bmp.Dispose();",
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+                var proc = System.Diagnostics.Process.Start(psi);
+                string stdOut = proc.StandardOutput.ReadToEnd();
+                string stdErr = proc.StandardError.ReadToEnd();
+                proc.WaitForExit();
+                screenshotSuccess = File.Exists(tempFile);
+                debugOutput = $"STDOUT:\n{stdOut}\nSTDERR:\n{stdErr}";
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                // Use 'import' (ImageMagick) or 'gnome-screenshot' if available
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "bash",
+                    Arguments = $"-c \"which import && import -window root '{tempFile}' || (which gnome-screenshot && gnome-screenshot -f '{tempFile}')\"",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                var proc = System.Diagnostics.Process.Start(psi);
+                proc.WaitForExit();
+                screenshotSuccess = File.Exists(tempFile);
+            }
+            else if (OperatingSystem.IsMacOS())
+            {
+                // Use 'screencapture' on macOS
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "screencapture",
+                    Arguments = $"-x '{tempFile}'",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                var proc = System.Diagnostics.Process.Start(psi);
+                proc.WaitForExit();
+                screenshotSuccess = File.Exists(tempFile);
+            }
         }
-        // You can now use apiKey for further logic
+        catch (Exception ex)
+        {
+            this.WindowState = WindowState.Normal;
+            var leftTextBox = this.FindControl<TextBox>("LeftTextBox");
+            leftTextBox.Text = $"Screenshot failed: {ex.Message}\n{debugOutput}";
+            return;
+        }
+
+        if (!screenshotSuccess)
+        {
+            this.WindowState = WindowState.Normal;
+            var leftTextBox = this.FindControl<TextBox>("LeftTextBox");
+            leftTextBox.Text = $"Screenshot is not supported or failed on this platform.\n{debugOutput}";
+            return;
+        }
+
+        // Send to OCR
+        var leftTextBox2 = this.FindControl<TextBox>("LeftTextBox");
+        leftTextBox2.Text = "Processing OCR...";
+        var apiKey = ConfigHelper.ReadApiKey();
+        var model = CleanModelString(SelectedModel);
+        var client = new GroqApiClient(apiKey, model: model);
+        var ocrResult = await client.OcrImageAsync(tempFile);
+        leftTextBox2.Text = ocrResult ?? "No OCR result.";
+        this.WindowState = WindowState.Normal;
+        try { File.Delete(tempFile); } catch { }
     }
+
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
