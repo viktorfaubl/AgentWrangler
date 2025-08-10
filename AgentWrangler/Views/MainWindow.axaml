@@ -14,12 +14,19 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="7*" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <ComboBox x:Name="ModelComboBox" Width="400" Margin="10"
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Grid.Column="0">
+                <Button x:Name="SendButton" Content="Send" Width="100" Margin="10" />
+                <Button x:Name="OcrButton" Content="OCR" Width="100" Margin="10" />
+            </StackPanel>
+            <ComboBox x:Name="ModelComboBox" Grid.Column="2" Width="400" Margin="10"
                       ItemsSource="{Binding ModelList}" SelectedItem="{Binding SelectedModel, Mode=TwoWay}"/>
-            <Button x:Name="SendButton" Content="Send" Width="100" Margin="10" />
-            <Button x:Name="OcrButton" Content="OCR" Width="100" Margin="10" />
-        </StackPanel>
+        </Grid>
         <views:MainView Grid.Row="0" />
         <Separator Grid.Row="1" Margin="20,0" />
         <Grid Grid.Row="2" Margin="10,0,10,10">
