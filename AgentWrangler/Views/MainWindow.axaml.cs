@@ -46,6 +46,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DataContext = this;
         InitializeComponent();
         SelectedModel = ModelList.FirstOrDefault(m => m.StartsWith("compound-beta-mini"));
+        var sendButton = this.FindControl<Button>("SendButton");
+        sendButton.Click += SendButton_Click;
     }
     protected override async void OnOpened(EventArgs e)
     {
@@ -75,6 +77,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(model)) return "compound-beta-mini";
         int idx = model.IndexOf(" (");
         return idx > 0 ? model.Substring(0, idx) : model;
+    }
+
+    private async void SendButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var leftTextBox = this.FindControl<TextBox>("LeftTextBox");
+        var rightTextBox = this.FindControl<TextBox>("RightTextBox");
+        var input = leftTextBox.Text;
+        if (string.IsNullOrWhiteSpace(input)) return;
+        var apiKey = ConfigHelper.ReadApiKey();
+        var model = CleanModelString(SelectedModel);
+        var client = new GroqApiClient(apiKey, model: model);
+        rightTextBox.Text = "Sending...";
+        var result = await client.SendOcrResultAsync(input, "C#");
+        rightTextBox.Text = result ?? "No response.";
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
