@@ -72,7 +72,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     public static string CleanModelString(string model)
     {
-        if (string.IsNullOrWhiteSpace(model)) return "moonshotai/kimi-k2-instruct";
+        if (string.IsNullOrWhiteSpace(model)) return "compound-beta-mini";
         int idx = model.IndexOf(" (");
         return idx > 0 ? model.Substring(0, idx) : model;
     }
