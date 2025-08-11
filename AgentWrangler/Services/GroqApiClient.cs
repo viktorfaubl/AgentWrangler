@@ -123,5 +123,69 @@ namespace AgentWrangler.Services
                 return null;
             }
         }
+
+        /// <summary>
+        /// Transcribes an audio file to text using Groq's Whisper endpoint.
+        /// </summary>
+        /// <param name="audioPath">Path to the audio file.</param>
+        /// <param name="model">Model to use (default: whisper-large-v3-turbo).</param>
+        /// <param name="language">Language code (default: en).</param>
+        /// <param name="temperature">Temperature (default: 0).</param>
+        /// <returns>Transcription result as JSON string, or null if failed.</returns>
+        public async Task<string?> TranscribeAudioAsync(string audioPath, string? model = null, string language = "en", double temperature = 0)
+        {
+            if (!File.Exists(audioPath))
+                throw new FileNotFoundException($"Audio file not found: {audioPath}");
+
+            var endpoint = "https://api.groq.com/openai/v1/audio/transcriptions";
+            using var form = new MultipartFormDataContent();
+            form.Add(new StringContent("whisper-large-v3-turbo"), "model");
+            form.Add(new StringContent(temperature.ToString()), "temperature");
+            form.Add(new StringContent("verbose_json"), "response_format");
+            //form.Add(new StringContent("[\"word\"]"), "timestamp_granularities");
+            form.Add(new StringContent(language), "language");
+            var audioBytes = await File.ReadAllBytesAsync(audioPath);
+            var audioContent = new ByteArrayContent(audioBytes);
+            audioContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+            form.Add(audioContent, "file", Path.GetFileName(audioPath));
+
+            var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            request.Content = form;
+            request.Headers.Add("Authorization", $"Bearer {_apiKey}");
+            try
+            {
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                return ExtractTranscribedText(body);
+            }
+            catch (Exception)
+            {
+                // Log or handle error as needed
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Extracts only the transcribed text from the Groq transcription JSON response.
+        /// </summary>
+        /// <param name="jsonResponse">The JSON response string from Groq transcription.</param>
+        /// <returns>The transcribed text, or null if not found.</returns>
+        public static string? ExtractTranscribedText(string jsonResponse)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(jsonResponse);
+                if (doc.RootElement.TryGetProperty("text", out var textElement))
+                {
+                    return textElement.GetString();
+                }
+            }
+            catch
+            {
+                // Handle or log error as needed
+            }
+            return null;
+        }
     }
 }

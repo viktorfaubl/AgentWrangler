@@ -9,6 +9,16 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>DEBUG;WINDOWS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug-Linux'">
+    <DefineConstants>DEBUG;LINUX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug-MacOs'">
+    <DefineConstants>DEBUG;MACOS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.3" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.3" />
@@ -16,6 +26,7 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.3" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.3" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="SkiaSharp" Version="3.119.0" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.8" />
     <PackageReference Include="System.Windows.Extensions" Version="9.0.8" />

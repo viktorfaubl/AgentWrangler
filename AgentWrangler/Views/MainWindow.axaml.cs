@@ -1,17 +1,19 @@
-﻿using Avalonia.Controls;
+﻿using AgentWrangler.Services;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using AgentWrangler.Services;
-using Avalonia.Interactivity;
-using System.IO;
-using Avalonia.Media.Imaging;
-using Avalonia;
 using System.Windows.Forms;
+using Tmds.DBus.Protocol;
 
 namespace AgentWrangler.Views;
 
@@ -55,6 +57,66 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         sendButton.Click += SendButton_Click;
         var ocrButton = this.FindControl<Button>("OcrButton");
         ocrButton.Click += OcrButton_Click;
+        var micToggle = this.FindControl<ToggleButton>("MicTranscribeToggle");
+        micToggle.Checked += MicTranscribeToggle_Checked;
+        micToggle.Unchecked += MicTranscribeToggle_Unchecked;
+    }
+
+    private bool _isMicTranscribing = false;
+    private System.Threading.CancellationTokenSource? _micTranscribeCts;
+
+    public void AppendStatus(string message)
+    {
+        var statusLabel = this.FindControl<TextBlock>("StatusLabel");
+        if (statusLabel != null)
+        {
+            statusLabel.Text = message;
+        }
+    }
+
+    private async void MicTranscribeToggle_Checked(object? sender, RoutedEventArgs e)
+    {
+        _isMicTranscribing = true;
+        _micTranscribeCts = new System.Threading.CancellationTokenSource();
+        AppendStatus("Listening to microphone...");
+        var apiKey = ConfigHelper.ReadApiKey();
+        var model = CleanModelString(SelectedModel);
+        var client = new GroqApiClient(apiKey, model: model);
+        var leftTextBox = this.FindControl<TextBox>("LeftTextBox");
+        string tempAudioFile = Path.Combine(Path.GetTempPath(), $"mic_record_{Guid.NewGuid()}.wav");
+        try
+        {
+            // Record audio (10 seconds or until cancelled)
+            var recordedPath = await AgentWrangler.Services.AudioRecorder.RecordAudioAsync(tempAudioFile, 10, _micTranscribeCts.Token);
+            //if (!_isMicTranscribing) return;
+            if (string.IsNullOrEmpty(recordedPath) || !File.Exists(recordedPath))
+            {
+                AppendStatus($"Recording failed or file not found: {recordedPath}");
+                return;
+            }
+            AppendStatus("Transcribing audio...");
+            var transcript = await client.TranscribeAudioAsync(recordedPath, model: model, language: "en");
+            if (leftTextBox != null)
+            {
+                leftTextBox.Text += (leftTextBox.Text?.Length > 0 ? "\n" : "") + (transcript ?? "No transcription result.");
+            }
+            AppendStatus("Transcription done.");
+        }
+        catch (Exception ex)
+        {
+            AppendStatus($"Mic transcription error: {ex.Message}");
+        }
+        finally
+        {
+            try { if (File.Exists(tempAudioFile)) File.Delete(tempAudioFile); } catch { }
+        }
+    }
+
+    private void MicTranscribeToggle_Unchecked(object? sender, RoutedEventArgs e)
+    {
+        _isMicTranscribing = false;
+        _micTranscribeCts?.Cancel();
+        AppendStatus("(Microphone transcription stopped.)");
     }
 
     private async void OcrButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -117,27 +179,29 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         catch (Exception ex)
         {
             this.WindowState = WindowState.Normal;
-            var leftTextBox = this.FindControl<TextBox>("LeftTextBox");
-            leftTextBox.Text = $"Screenshot failed: {ex.Message}\n{debugOutput}";
+            AppendStatus($"Screenshot failed: {ex.Message}\n{debugOutput}");
             return;
         }
 
         if (!screenshotSuccess)
         {
             this.WindowState = WindowState.Normal;
-            var leftTextBox = this.FindControl<TextBox>("LeftTextBox");
-            leftTextBox.Text = $"Screenshot is not supported or failed on this platform.\n{debugOutput}";
+            AppendStatus($"Screenshot is not supported or failed on this platform.\n{debugOutput}");
             return;
         }
 
         // Send to OCR
-        var leftTextBox2 = this.FindControl<TextBox>("LeftTextBox");
-        leftTextBox2.Text = "Processing OCR...";
+        AppendStatus("Processing OCR...");
         var apiKey = ConfigHelper.ReadApiKey();
         var model = CleanModelString(SelectedModel);
         var client = new GroqApiClient(apiKey, model: model);
         var ocrResult = await client.OcrImageAsync(tempFile);
-        leftTextBox2.Text = ocrResult ?? "No OCR result.";
+        AppendStatus("OCR processing done.");
+        var leftTextBox = this.FindControl<TextBox>("LeftTextBox");
+        if (leftTextBox != null)
+        {
+            leftTextBox.Text += (leftTextBox.Text?.Length > 0 ? "\n" : "") + (ocrResult ?? "No OCR result.");
+        }
         this.WindowState = WindowState.Normal;
         try { File.Delete(tempFile); } catch { }
     }
