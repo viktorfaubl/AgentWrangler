@@ -8,6 +8,10 @@ Command Transcription: Transcribes spoken or typed commands with high accuracy.
 LLM Inference: Sends transcribed commands and screen data to a Groq-powered language model for intelligent processing.
 Cross-Platform: Built with .NET to support Windows, macOS, and Linux (currently tested on Windows only).
 
+📸 Screenshots
+
+![UI](./assets/UI.png)
+
 
 📋 Requirements
 
