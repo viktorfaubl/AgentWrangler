@@ -214,6 +214,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         AvaloniaXamlLoader.Load(this);
     }
+
+    protected override async void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        var apiKey = ConfigHelper.ReadApiKey();
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            apiKey = await OpenGroqKeyModal();
+            if (!string.IsNullOrWhiteSpace(apiKey))
+                ConfigHelper.SaveApiKey(apiKey);
+        }
+        // You can now use apiKey for further logic
+    }
+
     private async Task<string?> OpenGroqKeyModal()
     {
         var modal = new GroqKeyModal();

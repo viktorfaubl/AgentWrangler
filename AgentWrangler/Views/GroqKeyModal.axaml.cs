@@ -14,6 +14,8 @@ public partial class GroqKeyModal : Window
         InitializeComponent();
         var submitButton = this.FindControl<Button>("SubmitButton");
         submitButton.Click += SubmitButton_Click;
+        var groqKeyLink = this.FindControl<TextBlock>("GroqKeyLink");
+        groqKeyLink.PointerPressed += GroqKeyLink_PointerPressed;
     }
 
     private void InitializeComponent()
@@ -46,6 +48,23 @@ public partial class GroqKeyModal : Window
         {
             errorText.Text = "Invalid key. Please try again.";
             errorText.IsVisible = true;
+        }
+    }
+
+    private void GroqKeyLink_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        var url = "https://console.groq.com/keys";
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // Optionally handle error
         }
     }
 }

@@ -2,12 +2,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="AgentWrangler.Views.GroqKeyModal"
         Title="Enter Groq API Key"
-        Width="400" Height="200"
+        Width="400" Height="250"
         WindowStartupLocation="CenterOwner">
     <StackPanel Margin="20" Spacing="10">
         <TextBlock Text="Please enter your Groq API Key:"/>
         <TextBox x:Name="ApiKeyBox" Width="350"/>
         <TextBlock x:Name="ErrorText" Foreground="Red" IsVisible="False"/>
+        <TextBlock x:Name="GroqKeyLink" Text="Don't have a Key? Get one here." Foreground="Blue" Cursor="Hand" TextDecorations="Underline"/>
         <Button x:Name="SubmitButton" Content="Submit" Width="100" HorizontalAlignment="Right"/>
     </StackPanel>
 </Window>
