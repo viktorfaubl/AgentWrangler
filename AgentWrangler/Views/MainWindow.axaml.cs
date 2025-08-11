@@ -14,6 +14,9 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tmds.DBus.Protocol;
+using Avalonia.Input;
+using Avalonia.Data;
+using System.Windows.Input;
 
 namespace AgentWrangler.Views;
 
@@ -48,6 +51,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         set { _selectedModel = value; OnPropertyChanged(); }
     }
 
+    public ICommand SendHotkeyCommand { get; }
+    public ICommand OcrHotkeyCommand { get; }
+    public ICommand MicTranscribeHotkeyCommand { get; }
+    public ICommand ClearHotkeyCommand { get; }
+
     public MainWindow()
     {
         DataContext = this;
@@ -62,6 +70,44 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         micToggle.Unchecked += MicTranscribeToggle_Unchecked;
         var clearButton = this.FindControl<Button>("ClearButton");
         clearButton.Click += ClearButton_Click;
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        var sendButton = this.FindControl<Button>("SendButton");
+        var ocrButton = this.FindControl<Button>("OcrButton");
+        var micToggle = this.FindControl<ToggleButton>("MicTranscribeToggle");
+        var clearButton = this.FindControl<Button>("ClearButton");
+        switch (e.Key)
+        {
+            case Key.F5:
+                SendButton_Click(sendButton, null);
+                e.Handled = true;
+                break;
+            case Key.F6:
+                OcrButton_Click(ocrButton, null);
+                e.Handled = true;
+                break;
+            case Key.F7:
+                micToggle.IsChecked = !(micToggle.IsChecked ?? false);
+                e.Handled = true;
+                break;
+            case Key.F8:
+                ClearButton_Click(clearButton, null);
+                e.Handled = true;
+                break;
+        }
+    }
+
+    // RelayCommand implementation
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object?> _execute;
+        public RelayCommand(Action<object?> execute) { _execute = execute; }
+        public event EventHandler? CanExecuteChanged;
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter) => _execute(parameter);
     }
 
     private bool _isMicTranscribing = false;

@@ -22,10 +22,10 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal" Grid.Column="0">
-                <Button x:Name="SendButton" Content="Send" Width="100" Margin="10" />
-                <Button x:Name="OcrButton" Content="OCR" Width="100" Margin="10" />
-                <ToggleButton x:Name="MicTranscribeToggle" Content="Transcribe Mic" Width="140" Margin="10" />
-                <Button x:Name="ClearButton" Content="Clear" Width="100" Margin="10" Click="ClearButton_Click" />
+                <Button x:Name="SendButton" Content="Send (F5)" Width="100" Margin="10" />
+                <Button x:Name="OcrButton" Content="OCR (F6)" Width="100" Margin="10" />
+                <ToggleButton x:Name="MicTranscribeToggle" Content="Transcribe Mic (F7)" Width="140" Margin="10" />
+                <Button x:Name="ClearButton" Content="Clear (F8)" Width="100" Margin="10" Click="ClearButton_Click" />
             </StackPanel>
             <ComboBox x:Name="ModelComboBox" Grid.Column="2" Width="400" Margin="10"
                       ItemsSource="{Binding ModelList}" SelectedItem="{Binding SelectedModel, Mode=TwoWay}"/>
