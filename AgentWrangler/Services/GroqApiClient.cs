@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.IO;
+using AgentWrangler.Services;
 
 namespace AgentWrangler.Services
 {
@@ -43,7 +44,7 @@ namespace AgentWrangler.Services
             }
             catch (Exception e)
             {
-                // Log or handle error as needed
+                Logger.LogError(e, "GroqApiClient.SendOcrResultAsync");
                 return null;
             }
         }
@@ -117,9 +118,9 @@ namespace AgentWrangler.Services
                 }
                 return null;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // Log or handle error as needed
+                Logger.LogError(e, "GroqApiClient.OcrImageAsync");
                 return null;
             }
         }
@@ -159,9 +160,9 @@ namespace AgentWrangler.Services
                 var body = await response.Content.ReadAsStringAsync();
                 return ExtractTranscribedText(body);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // Log or handle error as needed
+                Logger.LogError(e, "GroqApiClient.TranscribeAudioAsync");
                 return null;
             }
         }
@@ -181,9 +182,9 @@ namespace AgentWrangler.Services
                     return textElement.GetString();
                 }
             }
-            catch
+            catch (Exception e)
             {
-                // Handle or log error as needed
+                Logger.LogError(e, "GroqApiClient.ExtractTranscribedText");
             }
             return null;
         }

@@ -51,6 +51,7 @@ namespace AgentWrangler.Services
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogError(ex, "AudioRecorder.RecordAudioAsync (Windows)");
                     return null;
                 }
 #endif
@@ -73,8 +74,9 @@ namespace AgentWrangler.Services
                     await proc.WaitForExitAsync((CancellationToken)cancellationToken);
                     return File.Exists(outputPath) ? outputPath : null;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Logger.LogError(ex, "AudioRecorder.RecordAudioAsync (Linux)");
                     return null;
                 }
             }
@@ -96,8 +98,9 @@ namespace AgentWrangler.Services
                     await proc.WaitForExitAsync((CancellationToken)cancellationToken);
                     return File.Exists(outputPath) ? outputPath : null;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Logger.LogError(ex, "AudioRecorder.RecordAudioAsync (MacOS)");
                     return null;
                 }
             }

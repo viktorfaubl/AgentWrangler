@@ -104,6 +104,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
+            Logger.LogError(ex, "MicTranscribeToggle_Checked");
             AppendStatus($"Mic transcription error: {ex.Message}");
         }
         finally
@@ -178,6 +179,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
+            Logger.LogError(ex, "OcrButton_Click screenshot");
             this.WindowState = WindowState.Normal;
             AppendStatus($"Screenshot failed: {ex.Message}\n{debugOutput}");
             return;
@@ -203,7 +205,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             leftTextBox.Text += (leftTextBox.Text?.Length > 0 ? "\n" : "") + (ocrResult ?? "No OCR result.");
         }
         this.WindowState = WindowState.Normal;
-        try { File.Delete(tempFile); } catch { }
+        try { File.Delete(tempFile); } catch { Logger.LogError($"Failed to delete temp file: {tempFile}", "OcrButton_Click cleanup"); }
     }
 
     private void InitializeComponent()

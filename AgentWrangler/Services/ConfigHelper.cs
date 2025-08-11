@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using AgentWrangler.Services;
 
 namespace AgentWrangler.Services;
 
@@ -37,14 +38,24 @@ public class ConfigHelper
             if (doc.RootElement.TryGetProperty("apiKey", out var keyProp))
                 return keyProp.GetString();
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "ConfigHelper.ReadApiKey");
+        }
         return null;
     }
 
     public static void SaveApiKey(string apiKey)
     {
         string path = GetConfigPath();
-        var json = JsonSerializer.Serialize(new { apiKey });
-        File.WriteAllText(path, json);
+        try
+        {
+            var json = JsonSerializer.Serialize(new { apiKey });
+            File.WriteAllText(path, json);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "ConfigHelper.SaveApiKey");
+        }
     }
 }
