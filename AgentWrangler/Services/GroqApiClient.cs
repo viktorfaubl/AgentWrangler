@@ -56,7 +56,7 @@ namespace AgentWrangler.Services
                 model = _model,
                 messages = new[]
                 {
-                    new { role = "system", content = $"You are a senior {language} developer. You are on an interview. Describe the given problem. Solve the given problem and explain the solution. Comment the code with the explanation. If you are given code, analyze it, run a practical code review and produce a clear, actionable report." },
+                    new { role = "system", content = $"You are an assistant. Answer short and summarized." },
                     new { role = "user", content = userInput }
                 },
                 temperature = 0.5

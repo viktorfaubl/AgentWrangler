@@ -60,6 +60,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var micToggle = this.FindControl<ToggleButton>("MicTranscribeToggle");
         micToggle.Checked += MicTranscribeToggle_Checked;
         micToggle.Unchecked += MicTranscribeToggle_Unchecked;
+        var clearButton = this.FindControl<Button>("ClearButton");
+        clearButton.Click += ClearButton_Click;
     }
 
     private bool _isMicTranscribing = false;
@@ -238,6 +240,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         rightTextBox.Text = "Sending...";
         var result = await client.SendOcrResultAsync(input, "C#");
         rightTextBox.Text = result ?? "No response.";
+    }
+
+    private void ClearButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var leftTextBox = this.FindControl<TextBox>("LeftTextBox");
+        if (leftTextBox != null)
+        {
+            leftTextBox.Text = string.Empty;
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

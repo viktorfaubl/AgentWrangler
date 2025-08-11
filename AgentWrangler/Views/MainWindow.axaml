@@ -10,9 +10,9 @@
         Title="AgentWrangler">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="Auto" /> <!-- Label row -->
             <RowDefinition Height="1*" />
+            <RowDefinition Height="Auto" /> <!-- Label row -->
+            <RowDefinition Height="0.1*" />
             <RowDefinition Height="7*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -25,6 +25,7 @@
                 <Button x:Name="SendButton" Content="Send" Width="100" Margin="10" />
                 <Button x:Name="OcrButton" Content="OCR" Width="100" Margin="10" />
                 <ToggleButton x:Name="MicTranscribeToggle" Content="Transcribe Mic" Width="140" Margin="10" />
+                <Button x:Name="ClearButton" Content="Clear" Width="100" Margin="10" Click="ClearButton_Click" />
             </StackPanel>
             <ComboBox x:Name="ModelComboBox" Grid.Column="2" Width="400" Margin="10"
                       ItemsSource="{Binding ModelList}" SelectedItem="{Binding SelectedModel, Mode=TwoWay}"/>
@@ -36,8 +37,14 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="LeftTextBox" Grid.Column="0" AcceptsReturn="True" VerticalAlignment="Stretch"/>
-            <TextBox x:Name="RightTextBox" Grid.Column="1" AcceptsReturn="True" VerticalAlignment="Stretch"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" /> <!-- Label row -->
+                <RowDefinition Height="*" />   <!-- TextBox row -->
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Question" Margin="0,0,0,5" FontWeight="Bold" HorizontalAlignment="Left"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" Text="Answer" Margin="0,0,0,5" FontWeight="Bold" HorizontalAlignment="Left"/>
+            <TextBox x:Name="LeftTextBox" Grid.Column="0" Grid.Row="1" AcceptsReturn="True" VerticalAlignment="Stretch" TextWrapping="Wrap"/>
+            <TextBox x:Name="RightTextBox" Grid.Column="1" Grid.Row="1" AcceptsReturn="True" VerticalAlignment="Stretch" TextWrapping="Wrap"/>
         </Grid>
     </Grid>
 </Window>
