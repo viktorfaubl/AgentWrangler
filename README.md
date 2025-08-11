@@ -1,61 +1,97 @@
-# AgentWrangler
+AgentWrangler
+A cross-platform C# application developed in Visual Studio 2022 that leverages OCR to capture your entire screen, transcribes spoken or typed commands, and sends them to a Groq-powered language model for inference.
 
-A cross-platform C# application developed in Visual Studio 2022 that uses OCR to capture your entire screen, transcribes your command, and sends it to a selected language model powered by Groq for inference.
-Features
+✨ Features
 
 Screen OCR: Captures and extracts text from your entire screen.
-Transcription: Transcribes spoken commands.
-LLM Inference: Sends transcribed commands to a Groq-powered language model for processing.
-Cross-Platform: Designed to work across multiple platforms (Windows, macOS, Linux), though currently tested only on Windows.
+Command Transcription: Transcribes spoken or typed commands with high accuracy.
+LLM Inference: Sends transcribed commands and screen data to a Groq-powered language model for intelligent processing.
+Cross-Platform: Built with .NET to support Windows, macOS, and Linux (currently tested on Windows only).
 
-Requirements
 
-Visual Studio 2022 (with .NET SDK 6.0 or higher)
-Groq API key (sign up at https://console.groq.com/keys)
-Required NuGet packages (listed in the project’s .csproj file)
+📋 Requirements
 
-Installation
+Visual Studio 2022 with .NET SDK 6.0 or higher
+Groq API Key: Obtain one at Groq Console
+NuGet Packages: Automatically managed in the project’s .csproj file
 
-Clone the Repository
-Open the .sln file in Visual Studio 2022.
-Restore NuGet packages (Visual Studio will prompt you, or run):dotnet restore
+
+🚀 Installation
+
+Clone the Repository:
+git clone https://github.com/your-repo/agentwrangler.git
+cd agentwrangler
+
+
+Open the Solution:
+
+Launch Visual Studio 2022 and open the .sln file.
+
+
+Restore NuGet Packages:
+
+Visual Studio will prompt you to restore packages, or run:dotnet restore
+
+
+
+
+
+
+🛠️ Usage
 
 Select a Model:
 
-The application will prompt you to choose a Groq model for inference (e.g., available models will be listed).
+Upon launching, choose a Groq model for inference from the available options.
 
 
 Provide a Command:
 
-Speak or type your command. The application will use OCR to capture screen content and transcribe your command.
-The transcribed command and screen data are sent to the selected Groq model for processing.
+Speak or type your command.
+The application uses OCR to capture screen content and transcribes your command.
+
 
 View Results:
 
-The model's response will be displayed in the application interface.
+The transcribed command and screen data are sent to the selected Groq model.
+The model's response is displayed in the application interface.
 
 
-Platform Support
+
+
+🖥️ Platform Support
 
 Tested: Windows
-Untested: macOS, Linux (cross-platform support is implemented using .NET but not fully validated)
+Untested: macOS, Linux (cross-platform support is implemented but not fully validated)
 
-Development Notes
 
-The application uses Groq for fast and efficient LLM inference. Ensure you have a valid API key.
-Screen OCR and Transcript also sent to Groq endpoints for processing.
-Currently optimized for Windows; testing on other platforms is ongoing.
+🔧 Development Notes
 
-Contributing
-Contributions are welcome! Please follow these steps:
+Groq Integration: The application relies on Groq for fast and efficient LLM inference. A valid API key is required.
+OCR and Transcription: Screen content and transcribed commands are processed via Groq endpoints.
+Platform Optimization: Currently optimized for Windows; testing on macOS and Linux is in progress.
+
+
+🤝 Contributing
+We welcome contributions! To get started:
 
 Fork the repository.
-Create a new branch (git checkout -b feature/your-feature).
-Commit your changes (git commit -m 'Add your feature').
-Push to the branch (git push origin feature/your-feature).
+Create a new branch:git checkout -b feature/your-feature
+
+
+Commit your changes:git commit -m 'Add your feature'
+
+
+Push to the branch:git push origin feature/your-feature
+
+
 Open a pull request.
 
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
-Contact
-For questions or support, please open an issue or contact viktor.faubl@gmail.com.
+
+📜 License
+This project is licensed under the MIT License.
+
+📬 Contact
+For questions or support, please:
+
+Open an issue on the repository.
+Email: viktor.faubl@gmail.com
