@@ -56,7 +56,7 @@ namespace AgentWrangler.Services
                 model = _model,
                 messages = new[]
                 {
-                    new { role = "system", content = $"You are an assistant. Answer short and summarized." },
+                    new { role = "system", content = $"You are a senior C# programmer. Answer only with the final code. Make the code O(logn) or better if possible. Think hard." },
                     new { role = "user", content = userInput }
                 },
                 temperature = 0.5
@@ -77,7 +77,7 @@ namespace AgentWrangler.Services
                 throw new FileNotFoundException($"Image file not found: {imagePath}");
 
             question =
-                "OCR this image, if the image contains multiple parts, OCR every part. Return only the OCR result, nothing else";
+                "OCR this image, if the image contains multiple parts, OCR every part. If the image contains images which can not be OCR-ed, describe them. Return only the OCR result, nothing else";
             string base64Image = Convert.ToBase64String(await File.ReadAllBytesAsync(imagePath));
             string imageMimeType = "image/jpeg"; // You may want to detect MIME type from extension
             string imageDataUrl = $"data:{imageMimeType};base64,{base64Image}";
